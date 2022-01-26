@@ -37,7 +37,11 @@ function App() {
       setError('');
     } catch (e) {
       console.error(e);
-      setError(`Invalid ${inputAddrFormat} address provided`);
+      if (typeof e === 'string') {
+        setError(e);
+      } else {
+        setError(`Invalid ${inputAddrFormat} address provided`);
+      }
       setOutputAddress('');
     }
   }

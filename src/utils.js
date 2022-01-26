@@ -21,7 +21,7 @@ export function convertSs58ToH160(ss58Addr) {
 function validateH160(h160Addr) {
   const re = /0x[0-9A-Fa-f]{40}/g;
   if(!re.test(h160Addr)) {
-    throw 'Invalid H160 address';
+    throw 'Invalid H160 address provided!';
   } 
 }
 
@@ -30,6 +30,6 @@ function validateSs58(ss58Addr) {
   console.log(ss58Addr.length);
   console.log(ss58Addr.at(0));
   if(ss58Addr.length !== 48 || ss58Addr.at(0) !== '5') {
-    throw 'Invalid SS58 address';
+    throw 'Invalid SS58 address provided!';
   }
 }
