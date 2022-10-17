@@ -1,22 +1,20 @@
 import { useState } from 'react';
 
-import {convertH160ToSs58, convertSs58ToH160} from './utils';
+import {convertH160ToSs58, convertSs58ToH160, 
+  ADDRESS_FORMAT, encodePubKey, CHAIN_PREFIX, encodePolkadotAddress, validateSs58, getPubKey} from './utils';
 
 import './App.css';
 
-const ADDRESS_FORMAT = {
-  ss58: 'SS58',
-  h160: 'H160',
-};
+
 
 function App() {
 
-  const [inputAddrFormat, setInputAddrFormat] = useState(ADDRESS_FORMAT.ss58);
+  const [inputAddrFormat, setInputAddrFormat] = useState(ADDRESS_FORMAT.snow);
   const [inputAddress, setInputAddress] = useState('');
   const [outputAddress, setOutputAddress] = useState('');
   const [error, setError] = useState('');
 
-  function handleFormatChange (e) {
+  function handleInputFormatChange (e) {
     setInputAddrFormat(e.target.value);
   }
 
@@ -24,17 +22,50 @@ function App() {
     setInputAddress(e.target.value);
   }
 
+  function getAllAddresses(ss58Address) {
+    const res = {};
+    res[ADDRESS_FORMAT.ss58] = ss58Address;
+    res[ADDRESS_FORMAT.h160] = convertSs58ToH160(ss58Address);
+    res[ADDRESS_FORMAT.pubKey] = getPubKey(ss58Address);
+    res[ADDRESS_FORMAT.snow] = encodePolkadotAddress(ss58Address, CHAIN_PREFIX.snow);
+
+    return res;
+  }
+
+  function formatAddresses(addressObj) {
+    const outputArray = [];
+    Object.entries(addressObj).forEach((entry) => {
+      if(inputAddrFormat !== entry[0])
+        outputArray.push(`<b>${entry[0]}</b>: \t${entry[1]}<br/><br/>`);
+    })
+
+    return outputArray.join('\n');
+  }
+
   function handleSubmit (e) {
     e.preventDefault();
     try {
-      let output = '';
-      if (inputAddrFormat === ADDRESS_FORMAT.ss58) {
-        output = convertSs58ToH160(inputAddress.trim());
-      } else {
-        output = convertH160ToSs58(inputAddress.trim());
+      const inputAddressTrimmed = inputAddress.trim();
+      let eqvSs58Addr = inputAddressTrimmed;
+
+      if (inputAddrFormat === ADDRESS_FORMAT.h160) {
+        // convert h160 to ss58
+        eqvSs58Addr = convertH160ToSs58(inputAddressTrimmed);
+
+      } else if (inputAddrFormat === ADDRESS_FORMAT.pubKey) {
+        // convert pubkey to ss58
+        eqvSs58Addr = encodePubKey(inputAddressTrimmed, CHAIN_PREFIX.ss58);
+
+      } else if(inputAddrFormat === ADDRESS_FORMAT.snow) {
+        // convert SNOW to ss58
+        eqvSs58Addr = encodePolkadotAddress(inputAddressTrimmed, CHAIN_PREFIX.ss58);
       }
-      setOutputAddress(output);
+
+      validateSs58(eqvSs58Addr);
+
+      setOutputAddress(formatAddresses(getAllAddresses(eqvSs58Addr)));
       setError('');
+
     } catch (e) {
       console.error(e);
       if (typeof e === 'string') {
@@ -51,9 +82,11 @@ function App() {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className='form-label'>Input address format: </label>
-          <select value={inputAddrFormat} onChange={handleFormatChange}>
+          <select value={inputAddrFormat} onChange={handleInputFormatChange}>
+            <option value={ADDRESS_FORMAT.snow}>SNOW (mainnet/testnet)</option>
             <option value={ADDRESS_FORMAT.ss58}>SS58 (Substrate)</option>
             <option value={ADDRESS_FORMAT.h160}>H160 (Etheruem)</option>
+            <option value={ADDRESS_FORMAT.pubKey}>Public (Global)</option>
           </select>
         </div>
 
@@ -70,15 +103,13 @@ function App() {
           <button type='submit'>Go!</button>
         </div>
         
-        <div className='output-address'>
-          {outputAddress}
-        </div>
-        
         <div className='error'>
           {error}
         </div>
 
       </form>
+      <div className='output-address' dangerouslySetInnerHTML={{__html: outputAddress}} />
+
     </div>
   );
 }

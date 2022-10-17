@@ -1,12 +1,13 @@
 .App, #root {
   display: flex;
-  justify-content: center;
+  justify-content:space-around;
   align-items: center;
+  flex-direction: column;;
 }
 
 .App {
   height: 400px;
-  width: 500px;
+  width: 700;
 }
 
 #root {
@@ -28,4 +29,8 @@
 
 .form-label {
   margin: 5px;
+}
+
+.output-address {
+  color: green;
 }
