@@ -86,7 +86,7 @@ function App() {
             <option value={ADDRESS_FORMAT.snow}>SNOW (mainnet/testnet)</option>
             <option value={ADDRESS_FORMAT.ss58}>SS58 (Substrate)</option>
             <option value={ADDRESS_FORMAT.h160}>H160 (Etheruem)</option>
-            <option value={ADDRESS_FORMAT.pubKey}>Public (Global)</option>
+            <option value={ADDRESS_FORMAT.pubKey}>Public Key (Global)</option>
           </select>
         </div>
 
