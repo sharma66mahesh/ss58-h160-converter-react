@@ -26,7 +26,7 @@ export function convertSs58ToH160(ss58Addr) {
   validateSs58(ss58Addr);
 
   const pubKey = getPubKey(ss58Addr);
-  return pubKey.slice(0, 40);
+  return pubKey.slice(0, 42);
 }
 
 export function getPubKey(ss58addr) {
