@@ -22,12 +22,13 @@ function App() {
     setInputAddress(e.target.value);
   }
 
-  function getAllAddresses(ss58Address) {
+  function getAllAddresses(ss58Address, defaultH160) {
     const res = {};
-    res[ADDRESS_FORMAT.ss58] = ss58Address;
-    res[ADDRESS_FORMAT.h160] = convertSs58ToH160(ss58Address);
-    res[ADDRESS_FORMAT.pubKey] = getPubKey(ss58Address);
     res[ADDRESS_FORMAT.snow] = encodePolkadotAddress(ss58Address, CHAIN_PREFIX.snow);
+    res[ADDRESS_FORMAT.arctic] = encodePolkadotAddress(ss58Address, CHAIN_PREFIX.arctic);
+    res[ADDRESS_FORMAT.h160] = defaultH160 ? defaultH160 : convertSs58ToH160(ss58Address);
+    res[ADDRESS_FORMAT.ss58] = ss58Address;
+    res[ADDRESS_FORMAT.pubKey] = getPubKey(ss58Address);
 
     return res;
   }
@@ -35,8 +36,7 @@ function App() {
   function formatAddresses(addressObj) {
     const outputArray = [];
     Object.entries(addressObj).forEach((entry) => {
-      if(inputAddrFormat !== entry[0])
-        outputArray.push(`<b>${entry[0]}</b>: \t${entry[1]}<br/><br/>`);
+      outputArray.push(`<b>${entry[0]}</b>: \t${entry[1]}<br/><br/>`);
     })
 
     return outputArray.join('\n');
@@ -47,9 +47,11 @@ function App() {
     try {
       const inputAddressTrimmed = inputAddress.trim();
       let eqvSs58Addr = inputAddressTrimmed;
+      let defaultH160;
 
       if (inputAddrFormat === ADDRESS_FORMAT.h160) {
         // convert h160 to ss58
+        defaultH160 = inputAddressTrimmed; // limitation of bidirectional H160 mapping
         eqvSs58Addr = convertH160ToSs58(inputAddressTrimmed);
 
       } else if (inputAddrFormat === ADDRESS_FORMAT.pubKey) {
@@ -59,11 +61,14 @@ function App() {
       } else if(inputAddrFormat === ADDRESS_FORMAT.snow) {
         // convert SNOW to ss58
         eqvSs58Addr = encodePolkadotAddress(inputAddressTrimmed, CHAIN_PREFIX.ss58);
+      } else if(inputAddrFormat === ADDRESS_FORMAT.arctic) {
+        // convert arctic to ss58
+        eqvSs58Addr = encodePolkadotAddress(inputAddressTrimmed, CHAIN_PREFIX.ss58);
       }
 
       validateSs58(eqvSs58Addr);
 
-      setOutputAddress(formatAddresses(getAllAddresses(eqvSs58Addr)));
+      setOutputAddress(formatAddresses(getAllAddresses(eqvSs58Addr, defaultH160)));
       setError('');
 
     } catch (e) {
@@ -83,7 +88,8 @@ function App() {
         <div className="form-group">
           <label className='form-label'>Input address format: </label>
           <select value={inputAddrFormat} onChange={handleInputFormatChange}>
-            <option value={ADDRESS_FORMAT.snow}>SNOW (mainnet/testnet)</option>
+            <option value={ADDRESS_FORMAT.snow}>SNOW Mainnet</option>
+            <option value={ADDRESS_FORMAT.snow}>Arctic Testnet</option>
             <option value={ADDRESS_FORMAT.ss58}>SS58 (Substrate)</option>
             <option value={ADDRESS_FORMAT.h160}>H160 (Etheruem)</option>
             <option value={ADDRESS_FORMAT.pubKey}>Public Key (Global)</option>

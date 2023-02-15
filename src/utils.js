@@ -5,12 +5,14 @@ export const ADDRESS_FORMAT = {
   ss58: 'SS58',
   h160: 'H160',
   snow: 'SNOW',
+  arctic: 'Arctic',
   pubKey: 'Public Key',
 };
 
 export const CHAIN_PREFIX = {
   snow: 2207,
   ss58: 42,
+  arctic: 2208,
 };
 
 export function convertH160ToSs58(h160Addr) {
