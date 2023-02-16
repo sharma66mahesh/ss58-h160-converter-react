@@ -89,7 +89,7 @@ function App() {
           <label className='form-label'>Input address format: </label>
           <select value={inputAddrFormat} onChange={handleInputFormatChange}>
             <option value={ADDRESS_FORMAT.snow}>SNOW Mainnet</option>
-            <option value={ADDRESS_FORMAT.snow}>Arctic Testnet</option>
+            <option value={ADDRESS_FORMAT.arctic}>Arctic Testnet</option>
             <option value={ADDRESS_FORMAT.ss58}>SS58 (Substrate)</option>
             <option value={ADDRESS_FORMAT.h160}>H160 (Etheruem)</option>
             <option value={ADDRESS_FORMAT.pubKey}>Public Key (Global)</option>
